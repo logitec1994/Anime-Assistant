@@ -2,3 +2,37 @@
 2025-07-02T23:24:55.339896+0300 INFO Database engine initialized for sqlite:///db/nekowatch.db
 2025-07-02T23:24:55.812130+0300 INFO Database tables created or already exist.
 2025-07-02T23:25:11.933026+0300 INFO Новый пользователь зарегистрирован: 5542006957
+2025-07-03T01:02:29.080618+0300 INFO Logging setup complete.
+2025-07-03T01:02:29.101996+0300 INFO Database engine initialized for sqlite:///db/nekowatch.db
+2025-07-03T01:02:29.105013+0300 INFO Database tables created or already exist.
+2025-07-03T01:02:49.683514+0300 INFO Существующий пользователь вернулся: 5542006957
+2025-07-03T01:03:01.415281+0300 INFO User 5542006957 initiated adding anime.
+2025-07-03T01:03:19.446607+0300 INFO User 5542006957 provided anime title: The Daily Life of the Immortal King
+2025-07-03T01:03:30.662839+0300 INFO User 5542006957 selected status: watching for anime: The Daily Life of the Immortal King
+2025-07-03T01:03:41.523917+0300 INFO User 5542006957 provided current episode: 11
+2025-07-03T01:03:46.319336+0300 INFO User 5542006957 provided watched time: 0 seconds
+2025-07-03T01:03:46.459007+0300 INFO Anime The Daily Life of the Immortal King added to the anime list
+2025-07-03T01:03:46.460006+0300 ERROR Error saving anime The Daily Life of the Immortal King for user 5542006957: Database.add_user_anime() got an unexpected keyword argument 'watched_time_in_sec'
+2025-07-03T01:04:04.258554+0300 INFO Существующий пользователь вернулся: 5542006957
+2025-07-03T01:04:12.398374+0300 INFO User 5542006957 initiated adding anime.
+2025-07-03T01:04:17.789325+0300 INFO User 5542006957 provided anime title: The Daily Life of the Immortal King
+2025-07-03T01:04:19.578928+0300 INFO User 5542006957 selected status: watching for anime: The Daily Life of the Immortal King
+2025-07-03T01:04:28.145554+0300 INFO User 5542006957 provided current episode: 11
+2025-07-03T01:04:30.272044+0300 INFO User 5542006957 provided watched time: 1 seconds
+2025-07-03T01:04:30.274097+0300 INFO Anime The Daily Life of the Immortal King already exists in the database
+2025-07-03T01:04:30.274097+0300 ERROR Error saving anime The Daily Life of the Immortal King for user 5542006957: Database.add_user_anime() got an unexpected keyword argument 'watched_time_in_sec'
+2025-07-03T01:06:21.254650+0300 INFO Logging setup complete.
+2025-07-03T01:06:21.274929+0300 INFO Database engine initialized for sqlite:///db/nekowatch.db
+2025-07-03T01:06:21.278101+0300 INFO Database tables created or already exist.
+2025-07-03T01:09:13.941229+0300 INFO Logging setup complete.
+2025-07-03T01:09:13.963062+0300 INFO Database engine initialized for sqlite:///db/nekowatch.db
+2025-07-03T01:09:13.966176+0300 INFO Database tables created or already exist.
+2025-07-03T01:09:17.141889+0300 INFO Существующий пользователь вернулся: 5542006957
+2025-07-03T01:09:20.296700+0300 INFO User 5542006957 initiated adding anime.
+2025-07-03T01:09:30.443988+0300 INFO User 5542006957 provided anime title: The Daily Life of the Immortal King
+2025-07-03T01:09:31.998871+0300 INFO User 5542006957 selected status: watching for anime: The Daily Life of the Immortal King
+2025-07-03T01:09:38.555817+0300 INFO User 5542006957 provided current episode: 11
+2025-07-03T01:09:40.296717+0300 INFO User 5542006957 provided watched time: 0 seconds
+2025-07-03T01:09:40.300346+0300 INFO Anime The Daily Life of the Immortal King already exists in the database
+2025-07-03T01:09:40.303380+0300 INFO Added UserAnime entry for user 1 and anime 1
+2025-07-03T01:09:40.456388+0300 INFO Anime The Daily Life of the Immortal King added for user 5542006957 with status watching
