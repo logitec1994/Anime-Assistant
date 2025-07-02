@@ -1,0 +1,4 @@
+2025-07-02T23:24:55.319683+0300 INFO Logging setup complete.
+2025-07-02T23:24:55.339896+0300 INFO Database engine initialized for sqlite:///db/nekowatch.db
+2025-07-02T23:24:55.812130+0300 INFO Database tables created or already exist.
+2025-07-02T23:25:11.933026+0300 INFO Новый пользователь зарегистрирован: 5542006957
