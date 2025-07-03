@@ -1,11 +1,12 @@
 from loguru import logger
 import os
+import sys
 
 def setup_logging():
     logger.remove()
 
     logger.add(
-        "sys.stderr",
+        sys.stderr,
         level="INFO",
         format="{time} {level} {message}",
         colorize=True
