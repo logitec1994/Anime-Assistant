@@ -1,67 +1,13 @@
-# bot/handlers.py
 from aiogram import Router, types, F
-from aiogram.filters import CommandStart, Command
+from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from loguru import logger
 from db.database import Database
 from db.models import User, Anime, UserAnime, AnimeStatus
 from bot.states import AddAnime
 from bot.keyboards import get_anime_status_keyboard
-from sqlalchemy.exc import IntegrityError # Для обработки ошибок уникальности
 
-# Создаем роутер для обработки команд и сообщений
 router = Router()
-
-@router.message(CommandStart())
-async def cmd_start(message: types.Message, db_session: Database):
-    """
-    Обработчик команды /start.
-    Регистрирует нового пользователя или приветствует существующего.
-    """
-    user_id = message.from_user.id
-    username = message.from_user.username
-    first_name = message.from_user.first_name
-    last_name = message.from_user.last_name
-
-    session = next(db_session.get_db()) # Получаем сессию базы данных
-
-    try:
-        # Пытаемся найти пользователя по telegram_id
-        user = session.query(User).filter_by(telegram_id=user_id).first()
-
-        if not user:
-            # Если пользователя нет, создаем нового
-            new_user = User(
-                telegram_id=user_id,
-                username=username,
-                first_name=first_name,
-                last_name=last_name
-            )
-            session.add(new_user)
-            session.commit()
-            session.refresh(new_user)
-            logger.info(f"Новый пользователь зарегистрирован: {new_user.telegram_id}")
-            await message.answer(
-                f"Привет, {message.from_user.full_name}! 👋\n"
-                "Добро пожаловать в NekoWatch — твоего личного помощника по аниме! "
-                "Я помогу тебе вести списки просмотренного и запланированного аниме."
-            )
-        else:
-            logger.info(f"Существующий пользователь вернулся: {user.telegram_id}")
-            await message.answer(
-                f"Снова привет, {message.from_user.full_name}! 👋\n"
-                "Рад тебя видеть в NekoWatch! Чем могу помочь?"
-            )
-    except IntegrityError:
-        session.rollback() # Откатываем транзакцию в случае ошибки
-        logger.error(f"Ошибка при регистрации пользователя {user_id}: конфликт ID.")
-        await message.answer("Произошла ошибка при регистрации. Пожалуйста, попробуйте еще раз.")
-    except Exception as e:
-        session.rollback()
-        logger.error(f"Неожиданная ошибка при обработке /start для {user_id}: {e}")
-        await message.answer("Произошла непредвиденная ошибка. Мы уже работаем над этим!")
-    finally:
-        session.close()
 
 @router.message(Command("add"))
 async def cmd_add(message: types.Message, state: FSMContext):
@@ -106,7 +52,7 @@ async def process_anime_status(callback: types.CallbackQuery, state: FSMContext,
         await state.set_state(AddAnime.waiting_for_current_episode)
     else:
         await callback.answer()
-        await save_anime_to_db(callback.message, state, db_session)
+        await save_anime_to_db(callback.message, state, db_session, telegram_user_id=callback.from_user.id)
 
 @router.message(AddAnime.waiting_for_current_episode)
 async def process_current_episode(message: types.Message, state: FSMContext):
@@ -129,18 +75,16 @@ async def process_watched_time(message: types.Message, state: FSMContext, db_ses
             raise ValueError("Watched time cannot be negative.")
         await state.update_data(watched_time_in_sec=watched_time)
         logger.info(f"User {message.from_user.id} provided watched time: {watched_time} seconds")
-        await save_anime_to_db(message, state, db_session)
+        await save_anime_to_db(message, state, db_session, telegram_user_id=message.from_user.id)
     except ValueError:
         await message.answer("Please provide a valid watched time in seconds.")
 
-async def save_anime_to_db(message: types.Message, state: FSMContext, db_session: Database):
+async def save_anime_to_db(message: types.Message, state: FSMContext, db_session: Database, telegram_user_id: int):
     user_data = await state.get_data()
     anime_title = user_data.get("title")
     anime_status = user_data.get("status")
     current_episode = user_data.get("current_episode", 0)
     watched_time_in_sec = user_data.get("watched_time_in_sec", 0)
-
-    telegram_user_id = message.from_user.id
     
     try:
         user = db_session.get_user_by_telegram_id(telegram_user_id)

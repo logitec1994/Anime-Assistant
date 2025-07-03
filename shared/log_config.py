@@ -8,7 +8,7 @@ def setup_logging():
     logger.add(
         sys.stderr,
         level="INFO",
-        format="{time} {level} {message}",
+        format="{time:YY-MM-DD HH:mm:ss} | {level} | {message}",
         colorize=True
     )
 
@@ -18,7 +18,7 @@ def setup_logging():
         rotation="50 MB",
         compression="zip",
         level="INFO",
-        format="{time:YYYY-MM-DD HH:mm:ss.SSS} | {level: <8} | {name}:{function}:{line} - {message}",
+        format="{time:YYYY-MM-DD HH:mm:ss} | {level: <8} | {name}:{function}:{line} - {message}",
         enqueue=True,
         retention="7 days"
     )

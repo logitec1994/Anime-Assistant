@@ -4,7 +4,10 @@ from aiogram import Bot, Dispatcher
 from shared.config import BOT_TOKEN
 from shared.log_config import setup_logging
 from db.database import Database
-from bot.handlers import router as user_router # Импортируем роутер
+
+from bot.handlers.common import router as common_router
+from bot.handlers.add_anime import router as add_anime_router
+from bot.handlers.list_anime import router as list_anime_router
 
 async def main():
     # 1. Настраиваем логирование
@@ -18,8 +21,10 @@ async def main():
     bot = Bot(token=BOT_TOKEN)
     dp = Dispatcher()
 
-    # 4. Регистрируем роутер с хэндлерами
-    dp.include_router(user_router)
+    # 4. Регистрируем роутеры
+    dp.include_router(common_router)
+    dp.include_router(add_anime_router)
+    dp.include_router(list_anime_router)
 
     # 5. Передаем объект базы данных в хэндлеры через middleware (будет добавлено позже, пока вручную)
     # Сейчас мы передаем db_session как аргумент в хэндлер.
@@ -33,7 +38,7 @@ async def main():
         # а хэндлер будет получать его как db_session.
         await dp.start_polling(bot, db_session=db)
     finally:
-        await bot.session.close() # Закрываем сессию бота при завершении
+        await bot.session.close()
 
 if __name__ == "__main__":
     asyncio.run(main())
