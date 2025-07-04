@@ -42,12 +42,37 @@ def get_pagination_keyboard(current_page: int, total_pages: int, category: str) 
 
     return builder.as_markup()
 
-def get_anime_actions_keyboard(user_anime_id: int) -> InlineKeyboardMarkup:
+def get_list_anime_keyboard_with_actions(anime_entries_on_page: list) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
-
-    builder.row(
-        InlineKeyboardButton(text="✏️ Edit", callback_data=f"edit_anime:{user_anime_id}"),
-        InlineKeyboardButton(text="🗑️ Remove", callback_data=f"delete_anime:{user_anime_id}")
-    )
-
+    for i, entry in enumerate(anime_entries_on_page):
+        builder.row(InlineKeyboardButton(text=f"{i + 1}. {entry.anime.title}", callback_data=f"show_actions:{entry.id}"))
     return builder.as_markup()
+
+def get_detail_actions_keyboard(user_anime_id: int) -> InlineKeyboardMarkup:
+    builder = InlineKeyboardBuilder()
+    builder.row(
+        InlineKeyboardButton(text="✏️ Редактировать", callback_data=f"edit_entry:{user_anime_id}"),
+        InlineKeyboardButton(text="🗑️ Удалить", callback_data=f"confirm_delete:{user_anime_id}")
+    )
+    builder.row(
+        InlineKeyboardButton(text="🔙 Назад", callback_data=f"back_to_list_from_detail")
+    )
+    return builder.as_markup()
+
+def get_confirm_delete_keyboard(user_anime_id: int) -> InlineKeyboardMarkup:
+    builder = InlineKeyboardBuilder()
+    builder.row(
+        InlineKeyboardButton(text="✅ Подтвердить", callback_data=f"delete_confirmed:{user_anime_id}"),
+        InlineKeyboardButton(text="❌ Отмена", callback_data=f"delete_cancelled:{user_anime_id}")
+    )
+    return builder.as_markup()
+
+# def get_anime_actions_keyboard(user_anime_id: int) -> InlineKeyboardMarkup:
+#     builder = InlineKeyboardBuilder()
+
+#     builder.row(
+#         InlineKeyboardButton(text="✏️ Edit", callback_data=f"edit_anime:{user_anime_id}"),
+#         InlineKeyboardButton(text="🗑️ Remove", callback_data=f"delete_anime:{user_anime_id}")
+#     )
+
+#     return builder.as_markup()

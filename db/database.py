@@ -6,6 +6,7 @@ from sqlalchemy.exc import IntegrityError
 from loguru import logger
 from shared.config import DB_PATH
 from db.models import Base, User, Anime, UserAnime, AnimeStatus
+from sqlalchemy.orm import joinedload
 
 
 class Database:
@@ -36,6 +37,7 @@ class Database:
     def create_anime(self, title: str, mal_id: int = None, total_episodes: int = None):
         with self.SessionLocal() as session:
             anime = self.get_anime_by_title(title)
+
             if anime:
                 logger.info(f"Anime {title} already exists in the database")
                 return anime
@@ -49,7 +51,7 @@ class Database:
             except IntegrityError:
                 session.rollback()
                 logger.warning(f"Anime {title} already exists in the database")
-                return self.get_anime_by_title(title)
+                return session.query(Anime).filter_by(title=title).first()
             except Exception as e:
                 session.rollback()
                 logger.error(f"Error creating anime {title}: {e}")
@@ -92,13 +94,13 @@ class Database:
                 query = query.filter(UserAnime.status == status)
             
             total_count = query.count()
-            user_anime_entries = query.order_by(UserAnime.added_at.desc()).offset(offset).limit(limit).all()
-            for entry in user_anime_entries:
-                entry.anime
+            user_anime_entries = query.options(joinedload(UserAnime.anime))\
+                .order_by(UserAnime.added_at.desc())\
+                .offset(offset).limit(limit).all()
             
             return user_anime_entries, total_count
     
-    def get_user_anime_entry(self, user_anime_id: int, new_status: AnimeStatus = None, current_episode: int = None, watched_time_in_sec: int = None):
+    def update_user_anime_entry(self, user_anime_id: int, new_status: AnimeStatus = None, current_episode: int = None, watched_time_in_sec: int = None):
         with self.SessionLocal() as session:
             entry = session.query(UserAnime).filter_by(id=user_anime_id).first()
             if not entry:
@@ -130,6 +132,13 @@ class Database:
                 logger.info(f"No updates made to UserAnime entry {user_anime_id}")
                 return entry
 
+    def fetch_user_anime_entry(self, user_anime_id: int):
+        with self.SessionLocal() as session:
+            return session.query(UserAnime)\
+                          .options(joinedload(UserAnime.anime), joinedload(UserAnime.user))\
+                          .filter_by(id=user_anime_id)\
+                          .first()
+
     def delete_user_anime_entry(self, user_anime_id: int):
         with self.SessionLocal() as session:
             entry = session.query(UserAnime).filter_by(id=user_anime_id).first()
@@ -142,7 +151,7 @@ class Database:
                 except Exception as e:
                     session.rollback()
                     logger.error(f"Error deleting UserAnime entry {user_anime_id}: {e}")
-                    raise
+                    raise # Rethrow the exception to be handled upstream
             else:
                 logger.warning(f"UserAnime entry with ID {user_anime_id} not found")
                 return False
