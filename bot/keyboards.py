@@ -67,12 +67,14 @@ def get_confirm_delete_keyboard(user_anime_id: int) -> InlineKeyboardMarkup:
     )
     return builder.as_markup()
 
-# def get_anime_actions_keyboard(user_anime_id: int) -> InlineKeyboardMarkup:
-#     builder = InlineKeyboardBuilder()
-
-#     builder.row(
-#         InlineKeyboardButton(text="✏️ Edit", callback_data=f"edit_anime:{user_anime_id}"),
-#         InlineKeyboardButton(text="🗑️ Remove", callback_data=f"delete_anime:{user_anime_id}")
-#     )
-
-#     return builder.as_markup()
+def get_edit_options_keyboard(user_anime_id: int):
+    builder = InlineKeyboardBuilder()
+    builder.row(
+        InlineKeyboardButton(text="Статус", callback_data=f"edit_field:status:{user_anime_id}"),
+        InlineKeyboardButton(text="Эпизод", callback_data=f"edit_field:episode:{user_anime_id}"),
+        InlineKeyboardButton(text="Время просмотра", callback_data=f"edit_field:watched_time:{user_anime_id}")
+    )
+    builder.row(
+        InlineKeyboardButton(text="⬅️ Отмена", callback_data=f"edit_cancel:{user_anime_id}") # Кнопка отмены редактирования
+    )
+    return builder.as_markup()

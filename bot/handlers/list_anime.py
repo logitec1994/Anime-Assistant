@@ -8,7 +8,9 @@ from bot.keyboards import (
     get_pagination_keyboard,
     get_list_anime_keyboard_with_actions,
     get_detail_actions_keyboard,
-    get_confirm_delete_keyboard
+    get_confirm_delete_keyboard,
+    get_edit_options_keyboard,
+    get_anime_status_keyboard
 )
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 import math
@@ -288,9 +290,70 @@ async def start_edit_anime_entry(callback: types.CallbackQuery, state: FSMContex
         return
     
     await state.update_data(user_anime_id=user_anime_id, anime_title=user_anime_entry.anime.title)
+
     await callback.message.edit_text(
         f"Вы начали редактирование аниме: {user_anime_entry.anime.title}. "
         "Пожалуйста, выберите, что вы хотите изменить:",
-        reply_markup=None # Soon
+        reply_markup=get_edit_options_keyboard(user_anime_id)
     )
+    await state.set_state(EditAnime.choosing_field_to_edit)
     logger.info(f"User {callback.from_user.id} started editing anime entry ID {user_anime_id}")
+
+@router.callback_query(F.data.startswith("edit_cancel:"),  EditAnime.choosing_field_to_edit)
+async def cancel_edit_anime_entry(callback: types.CallbackQuery, state: FSMContext, db_session: Database):
+    await callback.answer("Редактирование отменено.")
+
+    user_data = await state.get_data()
+    user_anime_id = user_data.get("user_anime_id")
+
+    if user_anime_id:
+        await state.clear()        
+
+        callback.data = f"show actions:{user_anime_id}"
+        await show_anime_details_and_actions(callback, db_session)
+        logger.info(f"User {callback.from_user.id} cancelled edit action for anime entry ID {user_anime_id}")
+    else:
+        await callback.message.edit_text("Не удалось найти ID аниме для отмены редактирования.")
+        logger.error(f"User {callback.from_user.id} tried to cancel edit without valid user_anime_id in state.")
+        await state.clear()
+    
+@router.callback_query(F.data.startswith("edit_field:"), EditAnime.choosing_field_to_edit)
+async def choose_edit_field(callback: types.CallbackQuery, state: FSMContext, db_session: Database):
+    await callback.answer()
+
+    parts = callback.data.split(":")
+    field_to_edit = parts[1]
+    user_anime_id = int(parts[2])
+
+    user_data = await state.get_data()
+    if user_data.get("user_anime_id") != user_anime_id:
+        await callback.message.edit_text("Не удалось найти аниме для редактирования. Пожалуйста, попробуйте снова.")
+        logger.error(f"User {callback.from_user.id} tried to edit anime entry ID {user_anime_id} but it doesn't match state.")
+        await state.clear()
+        return
+
+    anime_title = user_data.get("anime_title", "выбранного аниме")
+
+    if field_to_edit == "status":
+        await callback.message.edit_text(
+            f"Выберите новый статус для аниме: {anime_title}",
+            reply_markup=get_anime_status_keyboard()
+        )
+        await state.set_state(EditAnime.editing_status)
+        logger.info(f"User {callback.from_user.id} chose to edit status for anime entry ID {user_anime_id}")
+    elif field_to_edit == "episode":
+        await callback.message.edit_text(
+            f"Введите новый номер текущей серии для аниме: {anime_title}\n"
+        )
+        await state.set_state(EditAnime.editing_episode)
+        logger.info(f"User {callback.from_user.id} chose to edit episode for anime entry ID {user_anime_id}")
+    elif field_to_edit == "watched_time":
+        await callback.message.edit_text(
+            f"Введите новое время просмотра в секундах для аниме: {anime_title}\n"
+        )
+        await state.set_state(EditAnime.editing_watched_time)
+        logger.info(f"User {callback.from_user.id} chose to edit watched time for anime entry ID {user_anime_id}")
+    else:
+        await callback.message.edit_text("Неизвестное поле для редактирования. Пожалуйста, попробуйте снова.")
+        logger.error(f"User {callback.from_user.id} tried to edit unknown field '{field_to_edit}' for anime entry ID {user_anime_id}")
+        await state.clear()
