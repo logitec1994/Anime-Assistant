@@ -57,14 +57,13 @@ class Database:
                 logger.error(f"Error creating anime {title}: {e}")
                 raise
 
-    def add_user_anime(self, user_id: int, anime_id: int, status: AnimeStatus, current_episode: int = 0, watched_time_in_sec: int = 0):
+    def add_user_anime(self, user_id: int, anime_id: int, status: AnimeStatus, current_episode: int = 0):
         with self.SessionLocal() as session:
             user_anime_entry = session.query(UserAnime).filter_by(user_id=user_id, anime_id=anime_id).first()
 
             if user_anime_entry:
                 user_anime_entry.status = status
                 user_anime_entry.current_episode = current_episode
-                user_anime_entry.watched_time_in_sec = watched_time_in_sec
                 logger.info(f"Updated UserAnime entry for user {user_id} and anime {anime_id}")
             else:
                 user_anime_entry = UserAnime(
@@ -72,7 +71,6 @@ class Database:
                     anime_id=anime_id,
                     status=status,
                     current_episode=current_episode,
-                    watched_time_in_sec=watched_time_in_sec
                 )
                 session.add(user_anime_entry)
                 logger.info(f"Added UserAnime entry for user {user_id} and anime {anime_id}")
@@ -100,7 +98,7 @@ class Database:
             
             return user_anime_entries, total_count
     
-    def update_user_anime_entry(self, user_anime_id: int, new_status: AnimeStatus = None, current_episode: int = None, watched_time_in_sec: int = None):
+    def update_user_anime_entry(self, user_anime_id: int, new_status: AnimeStatus = None, current_episode: int = None):
         with self.SessionLocal() as session:
             entry = session.query(UserAnime).filter_by(id=user_anime_id).first()
             if not entry:
@@ -113,9 +111,6 @@ class Database:
                 updated = True
             if current_episode is not None and entry.current_episode != current_episode:
                 entry.current_episode = current_episode
-                updated = True
-            if watched_time_in_sec is not None and entry.watched_time_in_sec != watched_time_in_sec:
-                entry.watched_time_in_sec = watched_time_in_sec
                 updated = True
             
             if updated:

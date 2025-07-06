@@ -55,7 +55,6 @@ class UserAnime(Base):
     anime_id = Column(Integer, ForeignKey('anime.id'), nullable=False)
     status = Column(Enum(AnimeStatus), nullable=False)
     current_episode = Column(Integer, default=0) # Текущая серия (для статуса WATCHING)
-    watched_time_in_sec = Column(Integer, default=0) # Время просмотра в секундах для текущей серии
     added_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 

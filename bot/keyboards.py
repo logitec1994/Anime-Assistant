@@ -72,7 +72,6 @@ def get_edit_options_keyboard(user_anime_id: int):
     builder.row(
         InlineKeyboardButton(text="Статус", callback_data=f"edit_field:status:{user_anime_id}"),
         InlineKeyboardButton(text="Эпизод", callback_data=f"edit_field:episode:{user_anime_id}"),
-        InlineKeyboardButton(text="Время просмотра", callback_data=f"edit_field:watched_time:{user_anime_id}")
     )
     builder.row(
         InlineKeyboardButton(text="⬅️ Отмена", callback_data=f"edit_cancel:{user_anime_id}") # Кнопка отмены редактирования

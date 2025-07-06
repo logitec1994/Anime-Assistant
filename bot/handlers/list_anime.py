@@ -177,10 +177,6 @@ async def show_anime_details_and_actions(callback: types.CallbackQuery, db_sessi
     
     if user_anime_entry.status == AnimeStatus.WATCHING:
         details_text += f"Current episode: {user_anime_entry.current_episode}\n"
-        if user_anime_entry.watched_time_in_sec > 0:
-            minutes = user_anime_entry.watched_time_in_sec // 60
-            seconds = user_anime_entry.watched_time_in_sec % 60
-            details_text += f"Watched time: {minutes:02d}:{seconds:02d}\n"
 
     if user_anime_entry.anime.total_episodes:
         details_text += f"Всего серий: `{user_anime_entry.anime.total_episodes}`\n"
@@ -315,7 +311,7 @@ async def cancel_edit_anime_entry(callback: types.CallbackQuery, state: FSMConte
         await callback.message.edit_text("Не удалось найти ID аниме для отмены редактирования.")
         logger.error(f"User {callback.from_user.id} tried to cancel edit without valid user_anime_id in state.")
         await state.clear()
-    
+
 @router.callback_query(F.data.startswith("edit_field:"), EditAnime.choosing_field_to_edit)
 async def choose_edit_field(callback: types.CallbackQuery, state: FSMContext, db_session: Database):
     await callback.answer()
@@ -346,12 +342,6 @@ async def choose_edit_field(callback: types.CallbackQuery, state: FSMContext, db
         )
         await state.set_state(EditAnime.editing_episode)
         logger.info(f"User {callback.from_user.id} chose to edit episode for anime entry ID {user_anime_id}")
-    elif field_to_edit == "watched_time":
-        await callback.message.edit_text(
-            f"Введите новое время просмотра в секундах для аниме: {anime_title}\n"
-        )
-        await state.set_state(EditAnime.editing_watched_time)
-        logger.info(f"User {callback.from_user.id} chose to edit watched time for anime entry ID {user_anime_id}")
     else:
         await callback.message.edit_text("Неизвестное поле для редактирования. Пожалуйста, попробуйте снова.")
         logger.error(f"User {callback.from_user.id} tried to edit unknown field '{field_to_edit}' for anime entry ID {user_anime_id}")

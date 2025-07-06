@@ -55,36 +55,23 @@ async def process_anime_status(callback: types.CallbackQuery, state: FSMContext,
         await save_anime_to_db(callback.message, state, db_session, telegram_user_id=callback.from_user.id)
 
 @router.message(AddAnime.waiting_for_current_episode)
-async def process_current_episode(message: types.Message, state: FSMContext):
+async def process_current_episode(message: types.Message, state: FSMContext, db_session: Database):
     try:
         current_episode = int(message.text.strip())
         if current_episode < 0:
             raise ValueError("Episode number cannot be negative.")
         await state.update_data(current_episode=current_episode)
         logger.info(f"User {message.from_user.id} provided current episode: {current_episode}")
-        await message.answer(f"Got it! Type 0 to finish adding or provide current episode time")
-        await state.set_state(AddAnime.waiting_for_watched_time)
-    except ValueError:
-        await message.answer("Please provide a valid episode number.")
 
-@router.message(AddAnime.waiting_for_watched_time)
-async def process_watched_time(message: types.Message, state: FSMContext, db_session: Database):
-    try:
-        watched_time = int(message.text.strip())
-        if watched_time < 0:
-            raise ValueError("Watched time cannot be negative.")
-        await state.update_data(watched_time_in_sec=watched_time)
-        logger.info(f"User {message.from_user.id} provided watched time: {watched_time} seconds")
         await save_anime_to_db(message, state, db_session, telegram_user_id=message.from_user.id)
     except ValueError:
-        await message.answer("Please provide a valid watched time in seconds.")
+        await message.answer("Please provide a valid episode number.")
 
 async def save_anime_to_db(message: types.Message, state: FSMContext, db_session: Database, telegram_user_id: int):
     user_data = await state.get_data()
     anime_title = user_data.get("title")
     anime_status = user_data.get("status")
     current_episode = user_data.get("current_episode", 0)
-    watched_time_in_sec = user_data.get("watched_time_in_sec", 0)
     
     try:
         user = db_session.get_user_by_telegram_id(telegram_user_id)
@@ -106,7 +93,6 @@ async def save_anime_to_db(message: types.Message, state: FSMContext, db_session
             anime_id=anime.id,
             status=anime_status,
             current_episode=current_episode,
-            watched_time_in_sec=watched_time_in_sec
         )
 
         status_text = {
