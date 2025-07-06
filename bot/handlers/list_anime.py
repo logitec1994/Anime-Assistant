@@ -309,7 +309,6 @@ async def cancel_edit_anime_entry(callback: types.CallbackQuery, state: FSMConte
     if user_anime_id:
         await state.clear()        
 
-        callback.data = f"show actions:{user_anime_id}"
         await show_anime_details_and_actions(callback, db_session)
         logger.info(f"User {callback.from_user.id} cancelled edit action for anime entry ID {user_anime_id}")
     else:
