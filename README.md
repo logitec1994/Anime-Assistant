@@ -1,2 +1,0 @@
-# Anime-Assistant
-NekoWatch Bot
