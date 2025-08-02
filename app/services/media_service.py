@@ -14,3 +14,6 @@ class MediaService:
             category=category
         )
         return self.repo.save(new_item)
+
+    def get_item_by_title(self, title: str) -> MediaItemDTO | None:
+        return self.repo.get_by_title(title)

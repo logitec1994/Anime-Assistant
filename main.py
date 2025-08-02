@@ -11,6 +11,7 @@ if __name__ == "__main__":
     with SessionLocal() as session:
         repo = MediaRepository(session)
         item = MediaService(repo)
-        test = item.add_item("Naruto", "anime")
+        item.add_item("Naruto", "anime")
+        # test = item.get_item_by_title("Naruto")
 
-    print(test.id)
+    # print(test)
