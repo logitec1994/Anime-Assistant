@@ -1,26 +1,28 @@
-from models.media import MediaStatus
-from database.db import Database
-from repositories.media_repository import MediaRepository
-from services.media_service import MediaService
+import asyncio
+import logging
+import sys
+from os import getenv
 
-def main():
-    # Initialize
-    db = Database()
-    repository = MediaRepository(db)
-    service = MediaService(repository)
+from aiogram import Bot, Dispatcher
+from aiogram.client.default import DefaultBotProperties
+from aiogram.enums import ParseMode
+from bot.handlers.start import router as start_router
 
-    # db.recreate_table()
 
-    media = service.get_media_by_id(1)
+from dotenv import load_dotenv
 
-    print(media)
+load_dotenv()
 
-    service.update_media_status(1, MediaStatus.WATCHED)
+TOKEN = getenv("BOT_TOKEN")
 
-    items = service.get_all_media()
-    for item in items:
-        print(item.title, item.status)
+dp = Dispatcher()
+dp.include_router(start_router)
+
+async def main() -> None:
+    bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+    await dp.start_polling(bot)
 
 
 if __name__ == "__main__":
-    main()
+    logging.basicConfig(level=logging.INFO, stream=sys.stdout)
+    asyncio.run(main())
