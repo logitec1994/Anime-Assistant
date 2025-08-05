@@ -1,17 +1,26 @@
-from app.services.media_service import MediaService
-from database.repositories.media_repository import MediaRepository
-from database.session import SessionLocal
-from database.models.base import Base
-from database.session import engine
+from models.media import MediaStatus
+from database.db import Database
+from repositories.media_repository import MediaRepository
+from services.media_service import MediaService
+
+def main():
+    # Initialize
+    db = Database()
+    repository = MediaRepository(db)
+    service = MediaService(repository)
+
+    # db.recreate_table()
+
+    media = service.get_media_by_id(1)
+
+    print(media)
+
+    service.update_media_status(1, MediaStatus.WATCHED)
+
+    items = service.get_all_media()
+    for item in items:
+        print(item.title, item.status)
+
 
 if __name__ == "__main__":
-    Base.metadata.create_all(engine)
-    print("Все таблицы созданы")
-
-    with SessionLocal() as session:
-        repo = MediaRepository(session)
-        item = MediaService(repo)
-        item.add_item("Naruto", "anime")
-        # test = item.get_item_by_title("Naruto")
-
-    # print(test)
+    main()
