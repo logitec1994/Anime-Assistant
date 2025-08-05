@@ -1,16 +1,42 @@
-from enum import Enum, auto
+from models.media import MediaCategory, MediaBase
+from database.db import Database
+from repositories.media_repository import MediaRepository
+from services.media_service import MediaService
 
-class MediaCategory(Enum):
-    ANIME = auto()
-    MANGA = auto()
+def main():
+    # Initialize
+    db = Database()
+    repository = MediaRepository(db)
+    service = MediaService(repository)
 
+    try:
+        media_data = MediaBase(title="Attack on Titan3", category=MediaCategory.ANIME)
+        new_item = service.add_media(media_data)
+        print(f"Added: {new_item}")
+    except ValueError as e:
+        print(f"Ошибка: {e}")
 
-class MediaItem:
-    def __init__(self, title, category: MediaCategory):
-        self.title = title
-        self.category = category
+    try:
+        media_data = MediaBase(title="Attack on Titan", category=MediaCategory.MANGA)
+        new_item = service.add_media(media_data)
+        print(f"Added: {new_item}")
+    except ValueError as e:
+        print(f"Ошибка: {e}")
+
+    try:
+        media_data = MediaBase(title="Attack on Titan", category=MediaCategory.ANIME)
+        new_item = service.add_media(media_data)
+        print(f"Added: {new_item}")
+    except ValueError as e:
+        print(f"Ошибка: {e}")
+    
+
+    # Получение всех элементов
+    items = service.get_all_media()
+    print("\nВсе элементы в базе:")
+    for item in items:
+        print(f"ID={item.id}, Title={item.title}, Category={item.category.name}")
+
 
 if __name__ == "__main__":
-    media_category = MediaCategory.ANIME
-    media_title = "Attack on Titan"
-    media = MediaItem(media_title, media_category)
+    main()
