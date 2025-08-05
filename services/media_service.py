@@ -7,7 +7,11 @@ class MediaService:
         self.repository = repository
     
     def add_media(self, media_data: MediaBase) -> MediaItem:
-        item = MediaItem(title=media_data.title, category=media_data.category)
+        item = MediaItem(
+            title=media_data.title,
+            category=media_data.category,
+            status=media_data.status
+            )
         try:
             self.repository.add_item(item)
             return item
