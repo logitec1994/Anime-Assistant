@@ -1,11 +1,11 @@
-from enum import Enum, auto
+from enum import StrEnum
 
-class ItemStatus(Enum):
-    WANT_TO_WATCH = auto()
-    WATCHED = auto()
+class ItemStatus(StrEnum):
+    WANT_TO_WATCH = "want_to_watch"
+    WATCHED = "watched"
 
-class ItemCategory(Enum):
-    ANIME = auto()
-    MANGA = auto()
-    MOVIE = auto()
-    SERIES = auto()
+class ItemCategory(StrEnum):
+    ANIME = "anime"
+    MANGA = "manga"
+    MOVIE = "movie"
+    SERIES = "series"
