@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from database.repositories import ItemRepository
-from shared.dto import ItemCreateDTO
+from shared.dto import ItemCreateDTO, ItemUpdateDTO
 
 from sqlalchemy.exc import IntegrityError
 
@@ -14,12 +14,31 @@ class ItemService:
             self.repository.db_session.commit()
             self.repository.db_session.refresh(new_item)
             return ItemCreateDTO(
-                # Need to use new_item instead of getattr
-                id=getattr(new_item, "id"), # To avoid type incompatibility warning
-                title=getattr(new_item, "title"), # To avoid type incompatibility warning
-                status=getattr(new_item, "status"), # To avoid type incompatibility warning
-                category=getattr(new_item, "category") # To avoid type incompatibility warning
+                id=new_item.id,
+                title=new_item.title,
+                status=new_item.status,
+                category=new_item.category
             )
         except IntegrityError:
             self.repository.db_session.rollback()
-            return "Item already exists with this title"
+            return f"Item already exists with title {item.title} and category {item.category}"
+    
+    def get_items(self) -> list[ItemCreateDTO]:
+        items = self.repository.get_all_items()
+        return [ItemCreateDTO(
+            id=item.id,
+            title=item.title,
+            status=item.status,
+            category=item.category
+        ) for item in items]
+    
+    def update_status(self, item: ItemUpdateDTO) -> ItemCreateDTO | str:
+        updated_item = self.repository.update_item_status(item)
+        if not updated_item:
+            return f"Item with id {item.id} not found"
+        return ItemCreateDTO(
+            id=updated_item.id,
+            title=updated_item.title,
+            status=updated_item.status,
+            category=updated_item.category
+        )
