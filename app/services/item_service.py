@@ -36,6 +36,8 @@ class ItemService:
         updated_item = self.repository.update_item_status(item)
         if not updated_item:
             return f"Item with id {item.id} not found"
+        self.repository.db_session.commit()
+        self.repository.db_session.refresh(updated_item)
         return ItemCreateDTO(
             id=updated_item.id,
             title=updated_item.title,
