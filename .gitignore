@@ -4,6 +4,7 @@ __pycache__/
 *$py.class
 
 AGENTS.md
+opencode.json
 
 # C extensions
 *.so
