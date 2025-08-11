@@ -3,8 +3,8 @@ from os import getenv
 from dotenv import load_dotenv
 
 from aiogram import Bot, Dispatcher
-from aiogram.filters import Command
-from aiogram.types import Message
+
+from bot.handlers import start
 
 load_dotenv()
 
@@ -12,12 +12,7 @@ TOKEN = getenv("BOT_TOKEN")
 
 dp = Dispatcher()
 
-
-# Command handler
-@dp.message(Command("start"))
-async def command_start_handler(message: Message) -> None:
-    await message.answer("Hello! I'm a bot created with aiogram.")
-
+dp.include_router(start.router)
 
 # Run the bot
 async def main() -> None:
