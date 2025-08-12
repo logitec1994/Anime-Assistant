@@ -1,8 +1,9 @@
 from database.session import Base, engine
 from database.models import Item
+import asyncio
 
-def init_db():
-    Base.metadata.create_all(bind=engine)
+async def init_db():
+    await Base.metadata.create_all(bind=engine)
 
 if __name__ == "__main__":
-    init_db()
+    asyncio.run(init_db())
