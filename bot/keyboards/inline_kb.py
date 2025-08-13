@@ -1,5 +1,5 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-from shared.mappings import get_category_mappings
+from shared.mappings import get_category_mappings, get_status_mappings
 
 def start_keyboard() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(inline_keyboard=[
@@ -17,8 +17,8 @@ def category_keyboard() -> InlineKeyboardMarkup:
 
 def confirm_keyboard() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="Да", callback_data="confirm_add")],
-        [InlineKeyboardButton(text="Нет", callback_data="cancel_add")]
+        [InlineKeyboardButton(text="✅ Да", callback_data="confirm_add")],
+        [InlineKeyboardButton(text="❌ Нет", callback_data="cancel_add")]
     ])
 
 def items_list_keyboard(items: list) -> InlineKeyboardMarkup:
@@ -30,7 +30,15 @@ def items_list_keyboard(items: list) -> InlineKeyboardMarkup:
 
 def item_details_keyboard() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="Изменить статус", callback_data="change_status")],
-        [InlineKeyboardButton(text="Удалить", callback_data="delete_item")],
-        [InlineKeyboardButton(text="Назад", callback_data="back_to_list")]
+        [InlineKeyboardButton(text="🔄 Изменить статус", callback_data="change_status")],
+        [InlineKeyboardButton(text="🗑️ Удалить", callback_data="delete_item")],
+        [InlineKeyboardButton(text="⬅️ Назад", callback_data="back_to_list")]
     ])
+
+def change_status_keyboard() -> InlineKeyboardMarkup:
+    mappings = get_status_mappings()
+    buttons = [
+        [InlineKeyboardButton(text=text, callback_data=callback_data)]
+        for text, callback_data in mappings.values()
+    ]
+    return InlineKeyboardMarkup(inline_keyboard=buttons, row_width=2)
