@@ -42,3 +42,15 @@ class ItemService:
             status=updated_item.status,
             category=updated_item.category
         )
+    
+    def get_item_by_id(self, item_id: int) -> ItemCreateDTO | None:
+        item = self.repository.get_item_by_id(item_id)
+        if not item:
+            return None
+        
+        return ItemCreateDTO(
+            id=item.id,
+            title=item.title,
+            status=item.status,
+            category=item.category
+        )

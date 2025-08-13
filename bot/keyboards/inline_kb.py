@@ -20,3 +20,17 @@ def confirm_keyboard() -> InlineKeyboardMarkup:
         [InlineKeyboardButton(text="Да", callback_data="confirm_add")],
         [InlineKeyboardButton(text="Нет", callback_data="cancel_add")]
     ])
+
+def items_list_keyboard(items: list) -> InlineKeyboardMarkup:
+    buttons = [
+        [InlineKeyboardButton(text=f"{item.title}: {item.category}", callback_data=f"item_{item.id}")]
+        for item in items
+    ]
+    return InlineKeyboardMarkup(inline_keyboard=buttons)
+
+def item_details_keyboard() -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="Изменить статус", callback_data="change_status")],
+        [InlineKeyboardButton(text="Удалить", callback_data="delete_item")],
+        [InlineKeyboardButton(text="Назад", callback_data="back_to_list")]
+    ])
